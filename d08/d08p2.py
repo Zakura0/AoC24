@@ -23,19 +23,13 @@ for antenna in antennas:
             distance = (antenna[1] - antennas[i][1], antenna[2] - antennas[i][2])
             mult = 1
             mult_distance = (distance[0] * mult, distance[1] * mult)
-            first = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])
-            while 0 <= first[0] < height and 0 <= first[1] < width:
-                antinodes.add(first)
-                mult += 1
-                mult_distance = (distance[0] * mult, distance[1] * mult)
-                first = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])                
-            mult = 1
-            flip_distance = (distance[0] * -1, distance[1] * -1)
-            mult_distance = (flip_distance[0] * mult, flip_distance[1] * mult)
-            second = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])
-            while 0 <= second[0] < height and 0 <= second[1] < width:
-                antinodes.add(second)
-                mult += 1
-                mult_distance = (flip_distance[0] * mult, flip_distance[1] * mult)
-                second = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])
+            node = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])
+            for _ in range(2):
+                while 0 <= node[0] < height and 0 <= node[1] < width:
+                    antinodes.add(node)
+                    mult += 1
+                    mult_distance = (distance[0] * mult, distance[1] * mult)
+                    node = (antennas[i][1] + mult_distance[0], antennas[i][2] + mult_distance[1])
+                distance = (distance[0] * -1, distance[1] * -1) #flip
 print(len(antinodes))
+flip_distance = (distance[0] * -1, distance[1] * -1)
