@@ -55,6 +55,7 @@ def printPositions(positions):
         print(string + "\n")
         
 largest = 0
+pos_largest = set()
 for i in range(1, 10000):
     positions = set()
     for j in range(len(robots)):
@@ -64,9 +65,9 @@ for i in range(1, 10000):
     if largest < comp:
         largest = comp
         index = i
-    if i == 7672:
-        printPositions(positions)
+        pos_largest = positions
 
-print(index, largest)
+printPositions(pos_largest)
+print(index)
 
 
