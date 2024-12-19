@@ -8,7 +8,7 @@ width = 71
 
 grid = [["." for _ in range(width)] for _ in range(height)]
 
-def has_path():
+def has_path(grid):
     start = (0, 0)
     end = (height - 1, width - 1)
     queue = [start]
@@ -27,15 +27,26 @@ def has_path():
                 queue.append((new_x, new_y))
     return False
 
-for i in range(len(byte_positions)):
-    y, x = byte_positions[i]
-    grid[x][y] = "#"
-    if not has_path():
-        print(y, x)
-        break
+upper = len(byte_positions) - 1
+lower = 0
+while lower < upper:
+    middle = (upper + lower) // 2
+    grid_copy = [list(row) for row in grid]
+    for i in range(middle + 1):
+        y, x = byte_positions[i]
+        grid_copy[x][y] = "#"
+    if has_path(grid_copy):
+        lower = middle + 1
+    else:
+        upper = middle
+    
+x, y = byte_positions[lower]
+print(x,y)
 
-# for row in grid:
+# for row in grid_copy:
 #     print("".join(row))
+
+
 
 
 
