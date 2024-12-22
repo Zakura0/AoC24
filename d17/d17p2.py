@@ -62,7 +62,7 @@ for num in program[::-1]:
     next_valid = set()
     for a in valid:
         for bits in [0b0000, 0b0001, 0b0010, 0b0011, 0b0100, 0b0101, 0b0110, 0b0111]:
-            a_shifted = a * 8
+            a_shifted = a << 3
             a_shifted += bits
             if processA(a_shifted)[0] == num:
                 next_valid.add(a_shifted)
