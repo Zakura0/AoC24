@@ -20,13 +20,35 @@ def processNumber(x):
     return x
 
 result = 0
-
+buyers_sequences = []
 for num in initial_numbers:
-    best_prices = set()
-    difference = 0
-    for _ in range(2000):
-        num = processNumber(int(num))
-        ones_digit = num % 10
-        best_prices.add(ones_digit)
-    sorted_prices = sorted(best_prices, reverse=True)
-    print(sorted_prices)
+    num = int(num)
+    sequences = {}
+    for _ in range(1997):
+        temp = num
+        old_price = temp % 10
+        differences = []
+        difference = 0
+        for i in range(4):
+            temp = processNumber(temp)
+            price = temp % 10
+            difference = price - old_price
+            old_price = price
+            differences.append(difference)
+        if len(differences) == 4:
+            sequence =  (differences[0], differences[1], differences[2], differences[3])
+            if sequence not in sequences:
+                sequences[sequence] = price
+        num = processNumber(num)
+    buyers_sequences.append(sequences)
+
+test_dict = buyers_sequences[0]
+for sequences in buyers_sequences[1:]:
+    for sequence, price in sequences.items():
+        if sequence in test_dict:
+            test_dict[sequence] += price
+        else:
+            test_dict[sequence] = price
+
+result = max(test_dict.values())
+print(result)
