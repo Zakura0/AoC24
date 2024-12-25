@@ -28,11 +28,11 @@ def options(pos, grid):
         yield (1, (pr + dr, pc + dc, pd))
 
 def dijkstra(grid, start, end):
-    heap = [(0, start)]
+    queue = [(0, start)]
     seen = set()
     seen.add(start)
-    while heap:
-        total_cost, pos = heapq.heappop(heap)
+    while queue:
+        total_cost, pos = heapq.heappop(queue)
         seen.add(pos)
         cr, cc, _ = pos
         if (cr, cc) == end:
@@ -40,7 +40,7 @@ def dijkstra(grid, start, end):
         for cost, option in options(pos, grid):
             if option in seen:
                 continue
-            heapq.heappush(heap, (total_cost + cost, option))
+            heapq.heappush(queue, (total_cost + cost, option))
 
 print(dijkstra(grid, start, end))
     
