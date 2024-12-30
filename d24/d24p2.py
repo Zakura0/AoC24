@@ -1,76 +1,94 @@
-with open("input.txt", "r") as file:
+with open("input_swapped.txt", "r") as file:
     blocks = file.read().strip().split("\n\n")
 
 wires = {}
-statements = []
+statements = {}
 
 for line in blocks[0].splitlines():
     split = line.split(": ")
     wire, state = split[0], split[1]
     wires[wire] = int(state)
-
+    
 for line in blocks[1].splitlines():
-    split = line.split(" -> ")
-    result = split[1]
+    wire1, gate, wire2, _, result = line.split()
     wires[result] = None
-    gate = ""
-    if "XOR" in split[0]:
-        split = split[0].split(" XOR ")
-        wire1, wire2 = split[0], split[1]
-        gate = "^"
-    elif "OR" in split[0]:
-        split = split[0].split(" OR ")
-        wire1, wire2 = split[0], split[1]
-        gate = "|"
-    elif "AND" in split[0]:
-        split = split[0].split(" AND ")
-        wire1, wire2 = split[0], split[1]
-        gate = "&"
-    statements.append((wire1, wire2, result, gate))
+    statements[result] = (gate, wire1, wire2)
 
-done = set()
+def evaluate(wire):
+    if wires[wire] is not None and wire in wires:
+        return wires[wire]
+    gate, wire1, wire2 = statements[wire]
+    val1 = evaluate(wire1)
+    val2 = evaluate(wire2)
+    if gate == "AND":
+        result = val1 & val2
+    elif gate == "OR":
+        result = val1 | val2
+    elif gate == "XOR":
+        result = val1 ^ val2
+    wires[wire] = result
+    return result
 
-while any(value is None for value in wires.values()):
-    for element in statements:
-        wire1, wire2, result, gate = element
-        if wires[wire1] is None or wires[wire2] is None:
-                continue
-        if gate == "^":
-            wires[result] = wires[wire1] ^ wires[wire2]
-        elif gate == "|":
-            wires[result] = wires[wire1] or wires[wire2]
+def checkWire(check, expected):
+    for wire in wires:
+        if wire.startswith("x") or wire.startswith("y"):
+            continue
         else:
-            wires[result] = wires[wire1] and wires[wire2]
+            wires[wire] = None
+    evaluate(check)
+    if wires[check] != expected:
+        return False
+    else:
+        return True
 
-wires = dict(sorted(wires.items()))
-x = ""
-y = ""
-result = ""
-for key in wires:
-    if key.startswith("z"):
-        result = str(wires[key]) + result
-    if key.startswith("x"):
-        x = str(wires[key]) + x
-    if key.startswith("y"):
-        y = str(wires[key]) + y
+def print_tree(wire, indent=0, max_depth=2, current_depth=0):
+    if current_depth > max_depth or wire not in statements:
+        print(" " * indent + f"{wire}")
+        return
+    gate, wire1, wire2 = statements[wire]
+    print(" " * indent + f"{wire}: {gate}")
+    print_tree(wire1, indent + 4, max_depth, current_depth + 1)
+    print_tree(wire2, indent + 4, max_depth, current_depth + 1)
 
-expected = int(x, 2) + int(y, 2)
-expected = bin(expected)[2:]
-#result = int(result, 2)
+def checkBit(index):
+    for wire in wires:
+        if wire.startswith("x") or wire.startswith("y"):
+            wires[wire] = 0
+    x = f"x{index:02}"
+    y = f"y{index:02}"
+    z = f"z{index:02}"
 
-wrong = []
-index = []
+    failed = False
 
-for i, char in enumerate(expected):
-    if char != result[i]:
-        key = sorted(wires)[-i]
-        wrong.append(key)
+    wires[x] = 0
+    wires[y] = 0
+    if not checkWire(z, 0):
+        failed = True
+    wires[x] = 1
+    wires[y] = 0
+    if not checkWire(z, 1):
+        failed = True
+    wires[x] = 0
+    wires[y] = 1
+    if not checkWire(z, 1):
+        failed = True
+    wires[x] = 1
+    wires[y] = 1
+    if not checkWire(z, 0):
+        failed = True
+    
+    if failed:
+        print("Check failed at " + z)
+        print_tree(z)
+        return True
+    return False
+        
+for i in range(45):
+    if checkBit(i):
+        break
+else:
+    print("Passed!")
 
-affected = {}
-
-for w in wrong:
-    for s in statements:
-        w1, w2, r, operator =  s
-        if r == w:
-            if w not in affected:
-                affected[w] = [w1, w2]
+swapped = ["vwr", "z06", "tqm", "z11", "z16", "kfs", "gfv", "hcm"]
+swapped = sorted(swapped)
+print(",".join(swapped))
